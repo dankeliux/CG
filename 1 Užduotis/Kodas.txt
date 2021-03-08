@@ -1,0 +1,79 @@
+<html><head>
+  <script type="application/javascript">
+
+    function draw() {
+      var canvas = document.getElementById('canvas');
+      if (canvas.getContext) {
+        var ctx = canvas.getContext("2d");
+		var steps = 8;
+// Draw border
+      ctx.beginPath();
+      ctx.moveTo(0,0);
+      ctx.lineTo(500,0);
+      ctx.lineTo(500,500);
+      ctx.lineTo(0,500);
+      ctx.closePath();
+      ctx.stroke(); 
+      drawF(steps);
+      }
+        // Recursive draw 
+        function drawF(step) {
+          if (step > 0) {
+          step = step-1;
+          ctx.save();
+		  
+		  if(step==steps-1){
+		  		  ctx.fillStyle = "rgb(255,0,0)";
+		  }
+		  //transformation 1
+          ctx.transform(0,0.25,0.25,0,125,125);
+          drawF(step); 
+          ctx.restore();
+          ctx.save();
+		  
+		  if(step==steps-1){
+		  		  ctx.fillStyle = "rgb(0,255,0)";
+		  }
+		  
+		  //transformation 2
+          ctx.transform(0.5, 0, 0, 0.5, 250, 0); 
+          drawF(step); 
+		  ctx.restore();
+		  ctx.save();
+		  
+		  if(step==steps-1){
+			ctx.fillStyle = "rgb(0,0,255)";
+		  }
+		  //transformation 3
+          ctx.transform(-0.5, 0, 0, 0.5,500,250); 		  
+          drawF(step); 
+          ctx.restore();
+		  ctx.save();
+		  
+		  //transformation 4
+          ctx.transform(-0.5, 0, 0, -0.5, 250, 500);
+          drawF(step); 
+		  ctx.restore();
+          }
+          else draw_L(step);    
+        }       
+
+   function draw_L(step) {
+     ctx.beginPath();
+        ctx.moveTo(0,0);
+        ctx.lineTo(0,500);
+        ctx.lineTo(500,500);		
+        ctx.lineTo(500,200);
+        ctx.lineTo(100,200);
+        ctx.lineTo(100,0);
+        ctx.lineTo(0,0);
+        ctx.fill();
+   }      
+    }
+  </script>
+ </head>
+ <body onload="draw();">
+   <h1>Užduotis 1</h1>
+   <canvas id="canvas" width="500" height="500"></canvas>
+ 
+</body></html>
