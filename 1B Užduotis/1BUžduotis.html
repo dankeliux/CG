@@ -1,0 +1,137 @@
+<html><head>
+  <script type="application/javascript">
+	
+
+var ctx;
+var contexxxtt;
+var time = 0;
+var diff = 0.1;
+
+function draw(number){
+
+	var canvas = document.getElementById('canvas');
+	if (canvas.getContext){
+		ctx = canvas.getContext('2d');
+	    animationCall(number);
+		
+		
+	}
+}
+
+function transformF1(t){
+	ctx.save();
+	ctx.fillStyle = 'black';
+	var l1 = 1 - 1.25 * t;
+	var l2 = 1 - 0.75 * t;
+	ctx.transform(l1,0, 0,l2, 125*t,125*t);
+	ctx.rotate(Math.PI/2*t);
+	drawShape();
+	ctx.restore();
+}
+
+function transformF2(t){
+	ctx.save();
+	ctx.fillStyle = 'red';
+	var l = 1 - 0.5 * t;
+	ctx.transform(l, 0, 0, l, 250 * t, 0);
+	drawShape();
+	ctx.restore();
+}
+
+function transformF3(t){
+	ctx.save();
+	ctx.fillStyle = 'green';
+	var l1 = 1 - 0.5 * t;
+	var l2 = 1 - 0.5 * t;
+	ctx.transform(l1,0,0,l2, 250*t, 500*t);
+	ctx.rotate(-Math.PI * t);
+	drawShape();
+	ctx.restore();
+}
+
+function transformF4(t){
+	ctx.save();
+	ctx.fillStyle = 'blue';
+	var l1 = 1 - 1.5 * t;
+	var l2 = 1 - 0.5 * t;
+	         	
+	ctx.transform(l1, 0, 0, l2, 500 * t, 250 * t);
+	drawShape();
+	ctx.restore();
+}
+
+function animationCall(num){
+	setInterval(function(){
+	if(time<0.9999){
+	time = time + diff;
+	drawBorder();
+	if(num == 1){
+		transformF1(time);
+		}
+	else if(num == 2){
+		transformF2(time);
+		}	
+	else if(num == 3){
+		transformF3(time);
+		}
+	else{
+		transformF4(time);
+		}
+	}
+	},100)
+
+}
+
+function drawBorder(){
+	ctx.save();
+	ctx.beginPath();
+	ctx.moveTo(0, 0);
+	ctx.lineTo(500, 0);
+	ctx.lineTo(500, 500);
+	ctx.lineTo(0, 500);
+	ctx.closePath();
+	ctx.fillStyle = 'white';
+	ctx.fill();
+	ctx.stroke();
+	ctx.restore();
+}
+
+function drawShape(){
+     ctx.beginPath();
+        ctx.moveTo(0,0);
+        ctx.lineTo(0,500);
+        ctx.lineTo(500,500);		
+        ctx.lineTo(500,0);
+        ctx.lineTo(400,0);
+        ctx.lineTo(400,200);
+        ctx.lineTo(0,200);
+        ctx.fill();
+}
+
+
+   function button1(){
+		draw(1);
+   }
+      function button2(){
+		draw(2);
+   }
+      function button3(){
+		draw(3);
+   }
+      function button4(){
+		draw(4);
+   }
+  </script>
+ </head>
+ <body >
+
+   <h1>Užduotis 1B</h1>
+   <div>
+    <button onclick="button1()">Animacija 1</button>
+	<button onclick="button2()">Animacija 2</button>
+	<button onclick="button3()">Animacija 3</button>
+	<button onclick="button4()">Animacija 4</button>
+	</div>
+   <canvas id="canvas" width="500" height="500"></canvas>
+	
+</body></html>
