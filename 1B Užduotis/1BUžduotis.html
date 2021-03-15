@@ -3,18 +3,15 @@
 	
 
 var ctx;
-var contexxxtt;
 var time = 0;
-var diff = 0.1;
+var diff = 0.04;
 
 function draw(number){
 
 	var canvas = document.getElementById('canvas');
 	if (canvas.getContext){
 		ctx = canvas.getContext('2d');
-	    animationCall(number);
-		
-		
+		animationCall(number);
 	}
 }
 
@@ -23,8 +20,11 @@ function transformF1(t){
 	ctx.fillStyle = 'black';
 	var l1 = 1 - 1.25 * t;
 	var l2 = 1 - 0.75 * t;
-	ctx.transform(l1,0, 0,l2, 125*t,125*t);
-	ctx.rotate(Math.PI/2*t);
+	ctx.translate(125*t,125*t);
+	
+	//ctx.transform(l1,0, 0,l2, 125*t,125*t);
+	ctx.rotate(-Math.PI/2*t);
+	ctx.scale(l1,l2);
 	drawShape();
 	ctx.restore();
 }
@@ -62,7 +62,7 @@ function transformF4(t){
 
 function animationCall(num){
 	setInterval(function(){
-	if(time<0.9999){
+	if(time<0.999){
 	time = time + diff;
 	drawBorder();
 	if(num == 1){
@@ -79,7 +79,6 @@ function animationCall(num){
 		}
 	}
 	},100)
-
 }
 
 function drawBorder(){
