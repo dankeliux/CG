@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <script type="text/javascript" src="../libs/three.js"></script>
+    <script type="text/javascript" src="../libs/jquery-1.9.0.js"></script>
+    <script type="text/javascript" src="../libs/stats.js"></script>
+    <script type="text/javascript" src="../libs/dat.gui.js"></script>
+    <style>
+        body{
+            /* set margin to 0 and overflow to hidden, to go fullscreen */
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<div id="Stats-output">
+</div>
+<!-- Div which will hold the Output -->
+<div id="WebGL-output">
+</div>
+
+<!-- Javascript code that runs our Three.js examples -->
+<script type="text/javascript">
+
+    // once everything is loaded, we run our Three.js stuff.
+    $(function () {
+
+        var stats = initStats();
+
+        // create a scene, that will hold all our elements such as objects, cameras and lights.
+        var scene = new THREE.Scene();
+
+        // create a camera, which defines where we're looking at.
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        // create a render and set the size
+        var renderer = new THREE.WebGLRenderer();
+
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+
+		var arrowGeometry = new THREE.CylinderGeometry( 0, 3, 3, 32, true);
+		var arrowMaterial = new THREE.MeshBasicMaterial( {color: 0xff00ff} );
+		var arrow = new THREE.Mesh( arrowGeometry, arrowMaterial );
+		arrow.position.y = 8.5;
+		scene.add( arrow );
+		
+		var cylinderGeometry = new THREE.CylinderGeometry( 2, 2, 15, 32, true);
+		
+		var cylinderMaterial = new THREE.MeshBasicMaterial( {color: 0xff00ff} );
+		var cylinder = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
+		cylinder.position.y = 7.5;
+		cylinder.add(arrow);
+		scene.add( cylinder );
+        
+		
+		var axes = new THREE.AxisHelper( 20 );
+        scene.add(axes);
+		
+        // position and point the camera to the center of the scene
+        camera.position.x = -30;
+        camera.position.y = 20;
+        camera.position.z = 60;
+        camera.lookAt(scene.position);
+
+        // add subtle ambient lighting
+        var ambientLight = new THREE.AmbientLight(0x0c0c0c);
+        scene.add(ambientLight);
+
+        // add spotlight for the shadows
+        var spotLight = new THREE.SpotLight( 0xffffff );
+        spotLight.position.set( -20, 20, 20 );
+
+        scene.add( spotLight );
+
+        // add the output of the renderer to the html element
+        $("#WebGL-output").append(renderer.domElement);
+
+
+        var controls = new function() {
+            this.direction = 0.02;
+            this.origin = 0.03;
+			this.length = 0;
+			this.radius = 0;
+			this.color = 0xff00ff;
+			this.x = 0;
+			this.y = 0;
+			this.z = 0;
+			this.xAxisMouse = 0;
+			this.yAxisMouse = 0;
+			this.zAxisMouse = 0;
+			this.xAxis = false;
+			this.yAxis = false;
+			this.zAxis = false;
+			this.redraw = function(){
+				scene.remove(cylinder);
+				scene.remove(arrow);
+				
+				arrowGeometry = new THREE.CylinderGeometry( 0, 3 + (controls.radius * 1.5), 3, 32, true);
+				arrowMaterial = new THREE.MeshBasicMaterial( {color: controls.color} );
+				arrow = new THREE.Mesh( arrowGeometry, arrowMaterial );
+				scene.add( arrow );
+				
+				cylinderGeometry = new THREE.CylinderGeometry( 2 + controls.radius, 2 + controls.radius, 15 + controls.length, 32, true);
+				cylinderMaterial = new THREE.MeshBasicMaterial( {color: controls.color} );
+				cylinder = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
+				cylinder.position.x = controls.x;
+				cylinder.position.y = 7.5 + controls.y;
+				cylinder.position.z = controls.z;
+				cylinder.add(arrow);
+				arrow.position.y = 8.5 + controls.length/2;
+				cylinder.rotation.x = controls.xAxisMouse;
+				cylinder.rotation.y = controls.yAxisMouse;
+				cylinder.rotation.z = controls.zAxisMouse;
+				scene.add( cylinder );
+				
+			};
+        }
+
+
+		// User Interface
+        var gui = new dat.GUI();
+		var directionOnMouseFolder = gui.addFolder('Directions Mouse');
+		directionOnMouseFolder.add(controls, 'xAxisMouse',0,6.27).onChange(controls.redraw);
+		directionOnMouseFolder.add(controls, 'yAxisMouse',0,6.27).onChange(controls.redraw);
+		directionOnMouseFolder.add(controls, 'zAxisMouse',0,6.27).onChange(controls.redraw);
+		var directionFolder = gui.addFolder('Directions');
+        directionFolder.add(controls, 'xAxis', false).onChange(controls.redraw);
+		directionFolder.add(controls, 'yAxis', false).onChange(controls.redraw);
+		directionFolder.add(controls, 'zAxis', false).onChange(controls.redraw);
+		
+		var originFolder = gui.addFolder('Origin');
+        originFolder.add(controls, 'x',-10,10).onChange(controls.redraw);
+		originFolder.add(controls, 'y',-10,10).onChange(controls.redraw);
+		originFolder.add(controls, 'z',-10,10).onChange(controls.redraw);
+		gui.add(controls, 'length',-10,20).onChange(controls.redraw);
+		gui.add(controls, 'radius',0,20).onChange(controls.redraw);
+		gui.addColor(controls,'color').onChange(controls.redraw);
+		
+		
+		var vector = new THREE.Vector3(1,0,0);
+        render();
+		var step = 0;
+        function render() {
+		
+            stats.update();
+			if(controls.xAxis == true)
+			{
+			step += 0.02;
+			cylinder.rotation.x = step;
+			}
+			else if(controls.xAxis == false && controls.yAxis == false && controls.zAxis == false){
+			step = 0;
+			}
+			
+			if(controls.yAxis == true)
+			{
+			step += 0.02;
+			cylinder.rotation.y = step;
+			}
+			else if(controls.xAxis == false && controls.yAxis == false && controls.zAxis == false){
+			step = 0;
+			}
+			
+			if(controls.zAxis == true)
+			{
+			step += 0.02;
+			cylinder.rotation.z = step
+			}else if(controls.xAxis == false && controls.yAxis == false && controls.zAxis == false){
+			step = 0;
+			}
+			
+
+            requestAnimationFrame(render);
+            renderer.render(scene, camera);
+        }
+
+        function initStats() {
+
+            var stats = new Stats();
+
+            stats.setMode(0);
+
+            // Align top-left
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.left = '0px';
+            stats.domElement.style.top = '0px';
+
+            $("#Stats-output").append( stats.domElement );
+
+            return stats;
+        }
+		
+
+    });
+
+
+
+</script>
+</body>
+</html>

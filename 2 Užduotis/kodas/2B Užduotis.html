@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <script type="text/javascript" src="../libs/threeNew.js"></script>
+    <script type="text/javascript" src="../libs/jquery-1.9.0.js"></script>
+    <script type="text/javascript" src="../libs/stats.js"></script>
+    <script type="text/javascript" src="../libs/dat.gui.js"></script>
+    <style>
+        body{
+            /* set margin to 0 and overflow to hidden, to go fullscreen */
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<div id="Stats-output">
+</div>
+<!-- Div which will hold the Output -->
+<div id="WebGL-output">
+</div>
+
+<!-- Javascript code that runs our Three.js examples -->
+<script type="text/javascript">
+
+    // once everything is loaded, we run our Three.js stuff.
+    $(function () {
+
+        var stats = initStats();
+
+        // create a scene, that will hold all our elements such as objects, cameras and lights.
+        var scene = new THREE.Scene();
+
+        // create a camera, which defines where we're looking at.
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        // create a render and set the size
+        var renderer = new THREE.WebGLRenderer();
+
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+		
+		
+		// Create Sphere for every object 
+		var sphereGeometry = new THREE.SphereGeometry(0.75);
+		var sphereMaterialTet=  new THREE.MeshPhongMaterial( {color: 0xffff00} );
+		var sphereMaterialOct=  new THREE.MeshPhongMaterial( {color: 0xff0000} );
+		var sphereMaterialBox=  new THREE.MeshPhongMaterial( {color: 0xff00ff} );
+		var sphereMaterialIco=  new THREE.MeshPhongMaterial( {color: 0x0000ff} );
+		
+		// Create Tetrahedron (1)
+		var tetGeometry = new THREE.TetrahedronGeometry (5, 0);
+		var tetMaterial =  new THREE.MeshPhongMaterial( {color: 0xffff00} );
+		tetMaterial.wireframe = true;
+		var tet = new THREE.Mesh(tetGeometry, tetMaterial);
+		var tetGroup = new THREE.Group();
+		
+		// Create Octahedron (2)
+		var octGeometry = new THREE.OctahedronGeometry(10, 0);
+		var octMaterial =  new THREE.MeshPhongMaterial( {color: 0xff0000} );
+		octMaterial.wireframe = true;
+		var oct = new THREE.Mesh(octGeometry, octMaterial);
+		var octGroup = new THREE.Group();
+
+		// Create Cube (3)
+		var boxGeometry = new THREE.BoxGeometry(20,20,20);
+		var boxMaterial =  new THREE.MeshPhongMaterial( {color: 0xff00ff} );
+		boxMaterial.wireframe = true;
+		var box = new THREE.Mesh( boxGeometry, boxMaterial );
+		var boxGroup = new THREE.Group();
+
+		// Create Icosahedron (4)
+		var icoGeometry = new THREE.IcosahedronGeometry (22, 0);
+		var icoMaterial =  new THREE.MeshPhongMaterial( {color: 0x0000ff} );
+		icoMaterial.wireframe = true;
+		var ico = new THREE.Mesh(icoGeometry, icoMaterial);
+		var icoGroup = new THREE.Group();
+		
+		var A = new THREE.Vector3(tet.geometry.attributes.position.array[0], tet.geometry.attributes.position.array[1], tet.geometry.attributes.position.array[2]);
+		var B = new THREE.Vector3(tet.geometry.attributes.position.array[3], tet.geometry.attributes.position.array[4], tet.geometry.attributes.position.array[5]);
+		
+		
+
+		var vec = B.clone(); vec.sub(A);
+		var normalLength = vec.length();
+
+
+		for(var i=0; i<128;i=i+3)
+		{
+		var A = new THREE.Vector3(tet.geometry.attributes.position.array[i], tet.geometry.attributes.position.array[i+1], tet.geometry.attributes.position.array[i+2]);
+		var B = new THREE.Vector3(tet.geometry.attributes.position.array[i+3], tet.geometry.attributes.position.array[i+4], tet.geometry.attributes.position.array[i+5]);
+		
+		var vec = B.clone(); vec.sub(A);
+		var h = vec.length();
+
+
+		if(normalLength == h)
+		{
+		
+		var sphere = new THREE.Mesh( sphereGeometry, sphereMaterialTet );
+		sphere.position.set(tet.geometry.attributes.position.array[i],tet.geometry.attributes.position.array[i+1],tet.geometry.attributes.position.array[i+2] )
+		tetGroup.add(sphere);
+
+		vec.normalize();
+		var quaternion = new THREE.Quaternion();
+		quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), vec);
+		var geometry = new THREE.CylinderGeometry(0.4, 0.4, h, 300);
+		geometry.translate(0, h / 2, 0);
+		var cylinder = new THREE.Mesh(geometry, tetMaterial);
+		cylinder.applyQuaternion(quaternion);
+		cylinder.position.set(A.x, A.y, A.z);
+		tetGroup.add(cylinder);
+
+		}
+		}
+
+		for(var i=0; i<44;i=i+3)
+		{
+			var sphere = new THREE.Mesh( sphereGeometry, sphereMaterialBox );
+			sphere.position.set(box.geometry.attributes.position.array[i],box.geometry.attributes.position.array[i+1],box.geometry.attributes.position.array[i+2] )
+			scene.add(sphere);
+			boxGroup.add(sphere);
+
+		}
+		
+		var A = new THREE.Vector3(box.geometry.attributes.position.array[0], box.geometry.attributes.position.array[1], box.geometry.attributes.position.array[2]);
+		var B = new THREE.Vector3(box.geometry.attributes.position.array[3], box.geometry.attributes.position.array[4], box.geometry.attributes.position.array[5]);
+		
+		
+
+		var vec = B.clone(); vec.sub(A);
+		var normalLength = vec.length();
+		
+		
+		for(var i=0; i<44;i=i+1)
+		{
+		var A = new THREE.Vector3(box.geometry.attributes.position.array[i], box.geometry.attributes.position.array[i+1], box.geometry.attributes.position.array[i+2]);
+		var B = new THREE.Vector3(box.geometry.attributes.position.array[i+3], box.geometry.attributes.position.array[i+4], box.geometry.attributes.position.array[i+5]);
+		
+		var vec = B.clone(); vec.sub(A);
+		var h = vec.length();
+		if(normalLength == h)
+		{
+		vec.normalize();
+		var quaternion = new THREE.Quaternion();
+		quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), vec);
+		var geometry = new THREE.CylinderGeometry(0.4, 0.4, h, 300);
+		geometry.translate(0, h / 2, 0);
+		var cylinder = new THREE.Mesh(geometry, boxMaterial);
+		cylinder.applyQuaternion(quaternion);
+		cylinder.position.set(A.x, A.y, A.z);
+		boxGroup.add(cylinder);
+		}
+		}
+
+
+		var A = new THREE.Vector3(oct.geometry.attributes.position.array[0], oct.geometry.attributes.position.array[1], oct.geometry.attributes.position.array[2]);
+		var B = new THREE.Vector3(oct.geometry.attributes.position.array[3], oct.geometry.attributes.position.array[4], oct.geometry.attributes.position.array[5]);
+		
+		var vec = B.clone(); vec.sub(A);
+		var normalLength = vec.length();
+
+
+		for(var i=0; i<128;i=i+3)
+		{
+		var A = new THREE.Vector3(oct.geometry.attributes.position.array[i], oct.geometry.attributes.position.array[i+1], oct.geometry.attributes.position.array[i+2]);
+		var B = new THREE.Vector3(oct.geometry.attributes.position.array[i+3], oct.geometry.attributes.position.array[i+4], oct.geometry.attributes.position.array[i+5]);
+		
+		var vec = B.clone(); vec.sub(A);
+		var h = vec.length();
+
+
+		if(normalLength == h)
+		{
+		
+			var sphere = new THREE.Mesh( sphereGeometry, sphereMaterialOct );
+			sphere.position.set(oct.geometry.attributes.position.array[i],oct.geometry.attributes.position.array[i+1],oct.geometry.attributes.position.array[i+2] )
+			octGroup.add(sphere);
+
+		vec.normalize();
+		var quaternion = new THREE.Quaternion();
+		quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), vec);
+		var geometry = new THREE.CylinderGeometry(0.4, 0.4, h, 300);
+		geometry.translate(0, h / 2, 0);
+		var cylinder = new THREE.Mesh(geometry, octMaterial);
+		cylinder.applyQuaternion(quaternion);
+		cylinder.position.set(A.x, A.y, A.z);
+		
+		octGroup.add(cylinder);
+		}
+		}
+
+
+
+		var A = new THREE.Vector3(ico.geometry.attributes.position.array[0], ico.geometry.attributes.position.array[1], ico.geometry.attributes.position.array[2]);
+		var B = new THREE.Vector3(ico.geometry.attributes.position.array[3], ico.geometry.attributes.position.array[4], ico.geometry.attributes.position.array[5]);
+		
+		var C = new THREE.Vector3(ico.geometry.attributes.position.array[12], ico.geometry.attributes.position.array[13], ico.geometry.attributes.position.array[14]);
+		var D = new THREE.Vector3(ico.geometry.attributes.position.array[15], ico.geometry.attributes.position.array[16], ico.geometry.attributes.position.array[17]);
+		
+		var vec = B.clone(); vec.sub(A);
+		var normalLength = vec.length();
+
+		var vec2 = D.clone(); vec2.sub(C);
+		var normalLength2 = vec2.length();
+
+
+		for(var i=0; i<256;i = i+3)
+		{
+		var A = new THREE.Vector3(ico.geometry.attributes.position.array[i], ico.geometry.attributes.position.array[i+1], ico.geometry.attributes.position.array[i+2]);
+		var B = new THREE.Vector3(ico.geometry.attributes.position.array[i+3], ico.geometry.attributes.position.array[i+4], ico.geometry.attributes.position.array[i+5]);
+		
+		var vec = B.clone(); vec.sub(A);
+		var h = vec.length();
+
+
+		if(normalLength == h || normalLength2 == h)
+		{
+		
+			var sphere = new THREE.Mesh( sphereGeometry, sphereMaterialIco );
+			sphere.position.set(ico.geometry.attributes.position.array[i],ico.geometry.attributes.position.array[i+1],ico.geometry.attributes.position.array[i+2] )
+			icoGroup.add(sphere);
+
+		vec.normalize();
+		var quaternion = new THREE.Quaternion();
+		quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), vec);
+		var geometry = new THREE.CylinderGeometry(0.4, 0.4, h, 300);
+		geometry.translate(0, h / 2, 0);
+		var cylinder = new THREE.Mesh(geometry, icoMaterial);
+		cylinder.applyQuaternion(quaternion);
+		cylinder.position.set(A.x, A.y, A.z);
+		
+		icoGroup.add(cylinder);
+		}
+		}
+		scene.add(icoGroup);
+        // position and point the camera to the center of the scene
+        camera.position.x = -40;
+        camera.position.y = 20;
+        camera.position.z = 30;
+        camera.lookAt(scene.position);
+
+        // add subtle ambient lighting
+        var ambientLight = new THREE.AmbientLight(0x0c0c0c);
+        scene.add(ambientLight);
+
+        // add spotlight for the shadows
+        var spotLight = new THREE.SpotLight( 0xffffff );
+        spotLight.position.set( -20, 20, 20 );
+
+        scene.add( spotLight );
+
+        // add the output of the renderer to the html element
+        $("#WebGL-output").append(renderer.domElement);
+
+
+		// Control Menu 
+        var controls = new function() {
+            this.tetrahedron = false;
+            this.octahedron = false;
+			this.hexahedron = false;
+			this.icosahedron = false;
+
+			this.redraw = function(){
+
+				// Tetrahedron conditions
+				if(controls.tetrahedron)
+				{
+					scene.add(tetGroup);
+				}
+				else{
+					scene.remove(tetGroup);
+				}
+				
+				// Octahedron conditions
+				if(controls.octahedron)
+				{
+					scene.add(octGroup);
+				}
+				else{
+					scene.remove(octGroup);
+				}
+
+				// Hexahedron conditions
+				if(controls.hexahedron)
+				{
+					scene.add(boxGroup);
+				}
+				else{
+					scene.remove(boxGroup);
+				}
+
+				// Icosahedron conditions
+				if(controls.icosahedron)
+				{
+					scene.add(icoGroup);
+				}
+				else{
+					scene.remove(icoGroup);
+				}
+			};
+        }
+
+
+		// User Interface (Control Menu)
+        var gui = new dat.GUI();
+		var geometryFolder = gui.addFolder('Geometry');
+		geometryFolder.add(controls, 'tetrahedron').onChange(controls.redraw);
+		geometryFolder.add(controls, 'octahedron').onChange(controls.redraw);
+		geometryFolder.add(controls, 'hexahedron').onChange(controls.redraw);
+		geometryFolder.add(controls, 'icosahedron').onChange(controls.redraw);
+			
+        render();
+
+        function render() {
+		
+            stats.update();
+
+            requestAnimationFrame(render);
+            renderer.render(scene, camera);
+        }
+
+        function initStats() {
+
+            var stats = new Stats();
+
+            stats.setMode(0);
+
+            // Align top-left
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.left = '0px';
+            stats.domElement.style.top = '0px';
+
+            $("#Stats-output").append( stats.domElement );
+
+            return stats;
+        }
+		
+
+    });
+
+
+
+</script>
+</body>
+</html>
