@@ -62,31 +62,31 @@
             }
 
             function getQueenFigure(color) {
-                const rook = new THREE.Group();
+                const queen = new THREE.Group();
 
                 var queenMaterial = getQueenMaterial(color) ;
 
                 var queenBaseGeometry = new THREE.CylinderGeometry(4,4,2,32);
                 var queenBaseMesh = new THREE.Mesh(queenBaseGeometry,queenMaterial);
-                rook.add(queenBaseMesh);
+                queen.add(queenBaseMesh);
 
                 var queenBase2Geometry = new THREE.CylinderGeometry(3,3.5,2,32);
                 var queenBase2Mesh = new THREE.Mesh(queenBase2Geometry,queenMaterial);
                 queenBase2Mesh.position.y = 1;    
-                rook.add(queenBase2Mesh);
+                queen.add(queenBase2Mesh);
 
                 var queenMiddleGeometry = new THREE.CylinderGeometry(2,2,10);
                 var queenMiddleMesh = new THREE.Mesh(queenMiddleGeometry,queenMaterial);
                 queenMiddleMesh.position.y = 6;      
-                rook.add(queenMiddleMesh);
+                queen.add(queenMiddleMesh);
 
                 var queenSphere = new THREE.SphereGeometry(1,32,32);
                 var queenSphereMesh = new THREE.Mesh(queenSphere,queenMaterial);
                 queenSphereMesh.position.y = 12;      
-                rook.add(queenSphereMesh);
+                queen.add(queenSphereMesh);
 
 
-                return rook;
+                return queen;
             }
 
             function getQueenMaterial(color) {
@@ -265,10 +265,10 @@
                     // Camera 2
                     let distH = 100;
                     let distV = 25;
-                    let rookCenterY = 12;
-                    camera2Model.lookAt(whiteQueen.position.x, whiteQueen.position.y + rookCenterY, whiteQueen.position.z);
+                    let CenterY = 12;
+                    camera2Model.lookAt(whiteQueen.position.x, whiteQueen.position.y + CenterY, whiteQueen.position.z);
                     camera2Model.position.x = whiteQueen.position.x;
-                    camera2Model.position.y = rookCenterY + distV;
+                    camera2Model.position.y = CenterY + distV;
                     camera2Model.position.z = whiteQueen.position.z - distH;
                    
                     camera2Helper.update();
